@@ -193,7 +193,8 @@ DATE=$(TZ=Europe/Ireland date +"%Y%m%d-%H%M")
 		else
 			msg "|| Updating Clang ||"
 			cd clang-llvm
-			git pull
+			git fetch --depth=1
+			git reset --hard origin
 			cd -
 		fi
 
@@ -208,7 +209,8 @@ DATE=$(TZ=Europe/Ireland date +"%Y%m%d-%H%M")
 	else
 		msg "|| Updating Anykernel ||"
 		cd AnyKernel3
-		git pull
+		git fetch --depth=1
+		git reset --hard origin
 		cd -
 	fi
 
