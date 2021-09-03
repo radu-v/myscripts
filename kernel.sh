@@ -48,24 +48,24 @@ KERNEL_DIR="$(pwd)"
 BASEDIR="$(basename "$KERNEL_DIR")"
 
 # The name of the Kernel, to name the ZIP
-ZIPNAME="azure"
+ZIPNAME="umod"
 
 # Build Author
 # Take care, it should be a universal and most probably, case-sensitive
-AUTHOR="Panchajanya1999"
+AUTHOR="radu-v"
 
 # Architecture
 ARCH=arm64
 
 # The name of the device for which the kernel is built
-MODEL="Redmi Note 7 Pro"
+MODEL="Nokia 8"
 
 # The codename of the device
-DEVICE="violet"
+DEVICE="NB1"
 
 # The defconfig which should be used. Get it from config.gz from
 # your device or check source
-DEFCONFIG=vendor/violet-perf_defconfig
+DEFCONFIG=nb1_defconfig
 
 # Specify compiler. 
 # 'clang' or 'gcc'
@@ -83,7 +83,7 @@ PTTG=1
 	if [ $PTTG = 1 ]
 	then
 		# Set Telegram Chat ID
-		CHATID="-1001231303646"
+		CHATID="-10015393729"
 	fi
 
 # Generate a full DEFCONFIG prior building. 1 is YES | 0 is NO(default)
@@ -94,12 +94,12 @@ FILES=Image.gz-dtb
 
 # Build dtbo.img (select this only if your source has support to building dtbo.img)
 # 1 is YES | 0 is NO(default)
-BUILD_DTBO=1
+BUILD_DTBO=0
 	if [ $BUILD_DTBO = 1 ]
 	then 
 		# Set this to your dtbo path. 
 		# Defaults in folder out/arch/arm64/boot/dts
-		DTBO_PATH="xiaomi/violet-sm6150-overlay.dtbo"
+		DTBO_PATH="nokia/nb1-msm8998-overlay.dtbo"
 	fi
 
 # Sign the zipfile
@@ -117,7 +117,7 @@ SIGN=1
 
 # Silence the compilation
 # 1 is YES(default) | 0 is NO
-SILENCE=0
+SILENCE=1
 
 # Verbose build
 # 0 is Quiet(default)) | 1 is verbose | 2 gives reason for rebuilding targets
@@ -169,7 +169,7 @@ KERVER=$(make kernelversion)
 COMMIT_HEAD=$(git log --oneline -1)
 
 # Set Date 
-DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
+DATE=$(TZ=Europe/Ireland date +"%Y%m%d-%H%M")
 
 #Now Its time for other stuffs like cloning, exporting, etc
 
@@ -186,7 +186,7 @@ DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
 	
 	if [ $COMPILER = "clang" ]
 	then
-		msg "|| Cloning Clang-13 ||"
+		msg "|| Cloning Clang ||"
 		git clone --depth=1 https://github.com/kdrag0n/proton-clang.git clang-llvm
 		# Toolchain Directory defaults to clang-llvm
 		TC_DIR=$KERNEL_DIR/clang-llvm
