@@ -67,7 +67,7 @@ DEVICE="NB1"
 # your device or check source
 DEFCONFIG=nb1_defconfig
 
-# Specify compiler. 
+# Specify compiler.
 # 'clang' or 'gcc'
 COMPILER=clang
 
@@ -83,7 +83,7 @@ PTTG=1
 	if [ $PTTG = 1 ]
 	then
 		# Set Telegram Chat ID
-		CHATID="-10015393729"
+		CHATID="15393729"
 	fi
 
 # Generate a full DEFCONFIG prior building. 1 is YES | 0 is NO(default)
@@ -96,8 +96,8 @@ FILES=Image.gz-dtb
 # 1 is YES | 0 is NO(default)
 BUILD_DTBO=0
 	if [ $BUILD_DTBO = 1 ]
-	then 
-		# Set this to your dtbo path. 
+	then
+		# Set this to your dtbo path.
 		# Defaults in folder out/arch/arm64/boot/dts
 		DTBO_PATH="nokia/nb1-msm8998-overlay.dtbo"
 	fi
@@ -168,7 +168,7 @@ KERVER=$(make kernelversion)
 # Set a commit head
 COMMIT_HEAD=$(git log --oneline -1)
 
-# Set Date 
+# Set Date
 DATE=$(TZ=Europe/Ireland date +"%Y%m%d-%H%M")
 
 #Now Its time for other stuffs like cloning, exporting, etc
@@ -183,17 +183,34 @@ DATE=$(TZ=Europe/Ireland date +"%Y%m%d-%H%M")
 		GCC64_DIR=$KERNEL_DIR/gcc64
 		GCC32_DIR=$KERNEL_DIR/gcc32
 	fi
-	
+
 	if [ $COMPILER = "clang" ]
 	then
-		msg "|| Cloning Clang ||"
-		git clone --depth=1 https://github.com/kdrag0n/proton-clang.git clang-llvm
+		if [ ! -d clang-llvm ]
+		then
+			msg "|| Cloning Clang ||"
+			git clone --depth=1 https://github.com/kdrag0n/proton-clang.git clang-llvm
+		else
+			msg "|| Updating Clang ||"
+			cd clang-llvm
+			git pull
+			cd -
+		fi
+
 		# Toolchain Directory defaults to clang-llvm
 		TC_DIR=$KERNEL_DIR/clang-llvm
 	fi
 
-	msg "|| Cloning Anykernel ||"
-	git clone --depth 1 --no-single-branch https://github.com/"$AUTHOR"/AnyKernel3.git
+	if [ ! -d AnyKernel3 ]
+	then
+		msg "|| Cloning Anykernel ||"
+		git clone --depth 1 --no-single-branch https://github.com/"$AUTHOR"/AnyKernel3.git
+	else
+		msg "|| Updating Anykernel ||"
+		cd AnyKernel3
+		git pull
+		cd -
+	fi
 
 	if [ $BUILD_DTBO = 1 ]
 	then
@@ -276,7 +293,7 @@ build_kernel() {
 	fi
 
 	BUILD_START=$(date +"%s")
-	
+
 	if [ $COMPILER = "clang" ]
 	then
 		MAKE+=(
@@ -297,7 +314,7 @@ build_kernel() {
 			STRIP=aarch64-elf-strip
 		)
 	fi
-	
+
 	if [ $SILENCE = "1" ]
 	then
 		MAKE+=( -s )
@@ -324,14 +341,14 @@ build_kernel() {
 				python2 "$KERNEL_DIR/scripts/ufdt/libufdt/utils/src/mkdtboimg.py" \
 					create "$KERNEL_DIR/out/arch/arm64/boot/dtbo.img" --page_size=4096 "$KERNEL_DIR/out/arch/arm64/boot/dts/$DTBO_PATH"
 			fi
-				gen_zip
-			else
+			gen_zip
+		else
 			if [ "$PTTG" = 1 ]
  			then
 				tg_post_build "error.log" "<b>Build failed to compile after $((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds</b>"
 			fi
 		fi
-	
+
 }
 
 ##--------------------------------------------------------------##
