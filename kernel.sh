@@ -162,7 +162,7 @@ then
 fi
 
 #Check Kernel Version
-KERVER=$(make kernelversion)
+KERVER=$(make --no-print-directory kernelversion)
 
 
 # Set a commit head
