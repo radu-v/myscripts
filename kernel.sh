@@ -71,6 +71,10 @@ DEFCONFIG=nb1_defconfig
 # 'clang' or 'gcc'
 COMPILER=clang
 
+# Use ccache
+# 1 or 0
+USE_CCACHE=1
+
 # Specify linker.
 # 'ld.lld'(default)
 LINKER=ld.lld
@@ -301,11 +305,20 @@ build_kernel() {
 		MAKE+=(
 			CROSS_COMPILE=aarch64-linux-gnu- \
 			CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-			CC=clang \
 			AR=llvm-ar \
 			OBJDUMP=llvm-objdump \
 			STRIP=llvm-strip
 		)
+		if [ $USE_CCACHE = 1 ]
+		then
+			MAKE+=(
+				CC="ccache clang"
+			)
+		else
+			MAKE+=(
+				CC="clang"
+			)
+		fi
 	elif [ $COMPILER = "gcc" ]
 	then
 		MAKE+=(
