@@ -119,6 +119,9 @@ SIGN=1
 		fi
 	fi
 
+# Remove the unsigned zip if signing is selected and successful
+REMOVE_UNSIGNED=1
+
 # Silence the compilation
 # 1 is YES(default) | 0 is NO
 SILENCE=1
@@ -391,7 +394,12 @@ gen_zip() {
  		fi
 		curl -sLo zipsigner-3.0.jar https://github.com/Magisk-Modules-Repo/zipsigner/raw/master/bin/zipsigner-3.0-dexed.jar
 		java -jar zipsigner-3.0.jar "$ZIP_FINAL".zip "$ZIP_FINAL"-signed.zip
-		ZIP_FINAL="$ZIP_FINAL-signed"
+
+		if [ $? = 0 ] && [ $REMOVE_UNSIGNED ]
+		then
+			rm "$ZIP_FINAL".zip
+			ZIP_FINAL="$ZIP_FINAL-signed"
+		fi
 	fi
 
 	if [ "$PTTG" = 1 ]
