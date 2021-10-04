@@ -63,6 +63,9 @@ MODEL="Nokia 8"
 # The codename of the device
 DEVICE="NB1"
 
+# Include branch name in the zip and kernel names
+WITH_BRANCH_NAME=1
+
 # The defconfig which should be used. Get it from config.gz from
 # your device or check source
 DEFCONFIG=nb1_defconfig
@@ -144,8 +147,12 @@ LOG_DEBUG=0
 DISTRO=$(source /etc/os-release && echo ${NAME})
 KBUILD_BUILD_HOST=$(uname -a | awk '{print $2}')
 CI_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+CI_BRANCH_CLEAN=${CI_BRANCH//_/}
+CI_BRANCH_CLEAN=${CI_BRANCH_CLEAN// /_}
+CI_BRANCH_CLEAN=${CI_BRANCH_CLEAN////_}
+CI_BRANCH_CLEAN=${CI_BRANCH_CLEAN//[^a-zA-Z0-9_]/}
 TERM=xterm
-export KBUILD_BUILD_HOST CI_BRANCH TERM
+export KBUILD_BUILD_HOST CI_BRANCH TERM CI_BRANCH_CLEAN
 
 ## Check for CI
 if [ "$CI" ]
@@ -171,12 +178,12 @@ fi
 #Check Kernel Version
 KERVER=$(make --no-print-directory kernelversion)
 
-
 # Set a commit head
 COMMIT_HEAD=$(git log --oneline -1)
 
 # Set Date
-DATE=$(TZ=Europe/Ireland date +"%Y%m%d-%H%M")
+export TZ=Europe/Ireland
+DATE=$(date +"%Y%m%d-%H%M")
 
 #Now Its time for other stuffs like cloning, exporting, etc
 
@@ -260,7 +267,6 @@ tg_post_msg() {
 	-d "disable_web_page_preview=true" \
 	-d "parse_mode=html" \
 	-d text="$1"
-
 }
 
 ##----------------------------------------------------------------##
@@ -288,7 +294,7 @@ build_kernel() {
 
 	if [ "$PTTG" = 1 ]
  	then
-		tg_post_msg "<b>$KBUILD_BUILD_VERSION Build Triggered</b>%0A<b>Host OS: </b><code>$DISTRO</code>%0A<b>Kernel Version : </b><code>$KERVER</code>%0A<b>Date : </b><code>$(TZ=Asia/Jakarta date)</code>%0A<b>Device : </b><code>$MODEL [$DEVICE]</code>%0A<b>Host Core Count : </b><code>$PROCS</code>%0A<b>Compiler Used : </b><code>$KBUILD_COMPILER_STRING</code>%0A<b>Linker : </b><code>$LINKER</code>%0a<b>Branch : </b><code>$CI_BRANCH</code>%0A<b>Top Commit : </b><code>$COMMIT_HEAD</code>%0A<a href='$SERVER_URL'>Link</a>"
+		tg_post_msg "<b>$KBUILD_BUILD_VERSION Build Triggered</b>%0A<b>Host OS: </b><code>$DISTRO</code>%0A<b>Kernel Version : </b><code>$KERVER</code>%0A<b>Date : </b><code>$(date)</code>%0A<b>Device : </b><code>$MODEL [$DEVICE]</code>%0A<b>Host Core Count : </b><code>$PROCS</code>%0A<b>Compiler Used : </b><code>$KBUILD_COMPILER_STRING</code>%0A<b>Linker : </b><code>$LINKER</code>%0a<b>Branch : </b><code>$CI_BRANCH</code>%0A<b>Top Commit : </b><code>$COMMIT_HEAD</code>"
 	fi
 
 	make O=out $DEFCONFIG
@@ -338,6 +344,14 @@ build_kernel() {
 		MAKE+=( -s )
 	fi
 
+	if [ $WITH_BRANCH_NAME = 1 ]
+	then
+		LAST_COMMIT=$(git rev-parse --verify --short=8 HEAD)
+		MAKE+=(
+			LOCALVERSION=-${CI_BRANCH_CLEAN}-$DATE-$LAST_COMMIT
+		)
+	fi
+
 	msg "|| Started Compilation ||"
 	make -kj"$PROCS" O=out \
 		NM=llvm-nm \
@@ -378,11 +392,17 @@ gen_zip() {
 	then
 		mv "$KERNEL_DIR"/out/arch/arm64/boot/dtbo.img AnyKernel3/dtbo.img
 	fi
-	cdir AnyKernel3
-	zip -r $ZIPNAME-$DEVICE-"$DATE" . -x ".git*" -x "README.md" -x "*.zip" -x "*.jar"
 
 	## Prepare a final zip variable
-	ZIP_FINAL="$ZIPNAME-$DEVICE-$DATE"
+	if [ $WITH_BRANCH_NAME = 1 ]
+	then
+		ZIP_FINAL="$ZIPNAME-$DEVICE-$CI_BRANCH_CLEAN-$DATE"
+	else
+		ZIP_FINAL="$ZIPNAME-$DEVICE-$DATE"
+	fi
+
+	cdir AnyKernel3
+	zip -r $ZIP_FINAL . -x ".git*" -x "README.md" -x "*.zip" -x "*.jar"
 
 	if [ $SIGN = 1 ]
 	then
