@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 # shellcheck disable=SC2154
 
  # Script For Building Android arm64 Kernel
@@ -348,7 +348,11 @@ build_kernel() {
 	then
 		LAST_COMMIT=$(git rev-parse --verify --short=8 HEAD)
 		MAKE+=(
-			LOCALVERSION=-${CI_BRANCH_CLEAN}-$DATE-$LAST_COMMIT
+			LOCALVERSION=-${KERVER}-${CI_BRANCH_CLEAN}-$DATE-$LAST_COMMIT
+		)
+	else
+		MAKE+=(
+			LOCALVERSION=-${KERVER}-$DATE-$LAST_COMMIT
 		)
 	fi
 
@@ -396,13 +400,13 @@ gen_zip() {
 	## Prepare a final zip variable
 	if [ $WITH_BRANCH_NAME = 1 ]
 	then
-		ZIP_FINAL="$ZIPNAME-$DEVICE-$CI_BRANCH_CLEAN-$DATE"
+		ZIP_FINAL="$ZIPNAME-$DEVICE-$KERVER-$CI_BRANCH_CLEAN-$DATE"
 	else
-		ZIP_FINAL="$ZIPNAME-$DEVICE-$DATE"
+		ZIP_FINAL="$ZIPNAME-$DEVICE-$KERVER-$DATE"
 	fi
 
 	cdir AnyKernel3
-	zip -r $ZIP_FINAL . -x ".git*" -x "README.md" -x "*.zip" -x "*.jar"
+	zip -r "$ZIP_FINAL".zip . -x ".git*" -x "README.md" -x "*.zip" -x "*.jar"
 
 	if [ $SIGN = 1 ]
 	then
