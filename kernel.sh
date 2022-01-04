@@ -347,11 +347,11 @@ build_kernel() {
 	then
 		LAST_COMMIT=$(git rev-parse --verify --short=8 HEAD)
 		MAKE+=(
-			LOCALVERSION=-${KERVER}-${CI_BRANCH_CLEAN}-$DATE-$LAST_COMMIT
+			LOCALVERSION=-${CI_BRANCH_CLEAN}-$DATE-$LAST_COMMIT
 		)
 	else
 		MAKE+=(
-			LOCALVERSION=-${KERVER}-$DATE-$LAST_COMMIT
+			LOCALVERSION=-$DATE-$LAST_COMMIT
 		)
 	fi
 
