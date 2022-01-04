@@ -64,7 +64,7 @@ MODEL="OnePlus 6T"
 DEVICE="fajita"
 
 # Include branch name in the zip and kernel names
-WITH_BRANCH_NAME=1
+WITH_BRANCH_NAME=0
 
 # The defconfig which should be used. Get it from config.gz from
 # your device or check source
