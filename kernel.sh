@@ -223,8 +223,7 @@ DATE=$(date +"%Y%m%d-%H%M")
 	else
 		msg "|| Updating Anykernel ||"
 		cd AnyKernel3
-		git fetch --depth=1
-		git reset --hard origin
+		git pull
 		cd -
 	fi
 
