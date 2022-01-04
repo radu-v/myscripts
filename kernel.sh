@@ -48,7 +48,7 @@ KERNEL_DIR="$(pwd)"
 BASEDIR="$(basename "$KERNEL_DIR")"
 
 # The name of the Kernel, to name the ZIP
-ZIPNAME="Atomix"
+ZIPNAME="Syberia"
 
 # Build Author
 # Take care, it should be a universal and most probably, case-sensitive
@@ -58,17 +58,17 @@ AUTHOR="radu-v"
 ARCH=arm64
 
 # The name of the device for which the kernel is built
-MODEL="Nokia 8"
+MODEL="OnePlus 6T"
 
 # The codename of the device
-DEVICE="NB1"
+DEVICE="fajita"
 
 # Include branch name in the zip and kernel names
 WITH_BRANCH_NAME=1
 
 # The defconfig which should be used. Get it from config.gz from
 # your device or check source
-DEFCONFIG=nb1_defconfig
+DEFCONFIG=syberia_defconfig
 
 # Specify compiler.
 # 'clang' or 'gcc'
@@ -106,7 +106,7 @@ BUILD_DTBO=0
 	then
 		# Set this to your dtbo path.
 		# Defaults in folder out/arch/arm64/boot/dts
-		DTBO_PATH="nokia/nb1-msm8998-overlay.dtbo"
+		DTBO_PATH="fajita-sdm845-overlay.dtbo"
 	fi
 
 # Sign the zipfile
