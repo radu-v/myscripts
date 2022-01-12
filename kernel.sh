@@ -145,7 +145,7 @@ LOG_DEBUG=0
 
 ## Set defaults first
 DISTRO=$(source /etc/os-release && echo ${NAME})
-KBUILD_BUILD_HOST=$(uname -a | awk '{print $2}')
+KBUILD_BUILD_HOST=local
 CI_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 CI_BRANCH_CLEAN=${CI_BRANCH//_/}
 CI_BRANCH_CLEAN=${CI_BRANCH_CLEAN// /_}
