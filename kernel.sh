@@ -78,9 +78,9 @@ COMPILER=clang
 # 1 or 0
 USE_CCACHE=1
 
-# Specify linker.
-# 'ld.lld'(default)
-LINKER=ld.lld
+# Specify linker, if not set, default is used
+# 'ld.lld'
+#LINKER=ld
 
 # Clean source prior building. 1 is NO(default) | 0 is YES
 INCREMENTAL=0
@@ -343,6 +343,12 @@ build_kernel() {
 		MAKE+=( -s )
 	fi
 
+	if [ ! -z $LINKER ]; then
+		MAKE+=(
+			LD=$LINKER
+		)
+	fi
+
 	if [ $WITH_BRANCH_NAME = 1 ]
 	then
 		LAST_COMMIT=$(git rev-parse --verify --short=8 HEAD)
@@ -359,7 +365,6 @@ build_kernel() {
 	make -kj"$PROCS" O=out \
 		NM=llvm-nm \
 		OBJCOPY=llvm-objcopy \
-		LD=$LINKER \
 		V=$VERBOSE \
 		"${MAKE[@]}" 2>&1 | tee error.log
 
